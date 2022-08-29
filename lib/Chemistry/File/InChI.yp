@@ -93,9 +93,18 @@ mh_counts: ',' mh_count
          | mh_counts ',' mh_count
          ;
 
-virtual_hydrogens: index ( ( "," |  "-" ) index )* "H" count? ;
+virtual_hydrogens: index ( ( "," |  "-" ) index )* 'H'
+                 | index ( ( "," |  "-" ) index )* 'H' count ;
 
-mobile_hydrogens: "(H" (count? "-" | count )? ( "," index )+ ")" ;
+mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
+                | '(' 'H' '-' comma_separated_indexes ')'
+                | '(' 'H' count '-' comma_separated_indexes ')'
+                | '(' 'H' count comma_separated_indexes ')'
+                ;
+
+comma_separated_indexes: ',' index
+                       | comma_separated_indexes ',' index
+                       ;
 
 index: nonzero
      | index digit
