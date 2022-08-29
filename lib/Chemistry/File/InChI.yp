@@ -6,7 +6,15 @@
 
 # The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
 
-string: prefix formula? connections? h_atoms? ; # TODO: many combinations
+string: prefix
+      | prefix formula
+      | prefix connections
+      | prefix h_atoms
+      | prefix formula connections
+      | prefix formula h_atoms
+      | prefix connections h_atoms
+      | prefix formula connections h_atoms
+      ;
 
 formula: '/' elemental
        | formula '.' elemental
@@ -66,7 +74,10 @@ tail: index
     | tail body
     ;
 
-hydrogens: (count "*")? ( vh_count ( "," mh_count )* )
+hydrogens: vh_count
+         | vh_count mh_counts
+         | count '*' vh_count
+         | count '*' vh_count mh_counts
          | mh_count
          ;
 
@@ -77,6 +88,10 @@ vh_count: virtual_hydrogens
 mh_count: mobile_hydrogens
         | mh_count mobile_hydrogens
         ;
+
+mh_counts: ',' mh_count
+         | mh_counts ',' mh_count
+         ;
 
 virtual_hydrogens: index ( ( "," |  "-" ) index )* "H" count? ;
 
