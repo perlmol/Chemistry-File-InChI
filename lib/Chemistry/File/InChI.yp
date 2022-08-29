@@ -64,7 +64,13 @@ bodies: body
       | bodies body
       ;
 
-branch: "(" ( index ( ( "," index ) | body )* ) ")" ;
+branch: '(' index ')'
+      | '(' index branch_body ')'
+      ;
+
+branch_body: ',' index
+           | body
+           | branch_body branch_body ;
 
 branches: branch
         | branches branch
@@ -93,8 +99,10 @@ mh_counts: ',' mh_count
          | mh_counts ',' mh_count
          ;
 
-virtual_hydrogens: index ( ( "," |  "-" ) index )* 'H'
-                 | index ( ( "," |  "-" ) index )* 'H' count ;
+virtual_hydrogens: index 'H'
+                 | index comma_or_dash_separated_indexes 'H'
+                 | index 'H' count ;
+                 | index comma_or_dash_separated_indexes 'H' count ;
 
 mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
                 | '(' 'H' '-' comma_separated_indexes ')'
@@ -105,6 +113,11 @@ mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
 comma_separated_indexes: ',' index
                        | comma_separated_indexes ',' index
                        ;
+
+comma_or_dash_separated_indexes: comma_separated_indexes
+                               | comma_separated_indexes '-' index
+                               | '-' index
+                               ;
 
 index: nonzero
      | index digit
