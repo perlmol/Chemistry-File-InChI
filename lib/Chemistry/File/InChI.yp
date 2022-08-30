@@ -48,7 +48,9 @@ branch: '(' index ')'
 
 branch_body: ',' index
            | body
-           | branch_body branch_body ;
+           | branch_body ',' index
+           | branch_body body
+           ;
 
 branches: branch
             { return [ $_[1] ] }
