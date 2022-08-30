@@ -16,8 +16,8 @@ string: prefix
       | prefix formula connections h_atoms
       ;
 
-formula: '/' elemental
-       | formula '.' elemental
+formula: formula_first
+       | formula formula_continuation
        ;
 
 connections: '/' 'c'
@@ -31,26 +31,6 @@ h_atoms: '/' 'h'
        | h_atoms ';'
        | h_atoms ';' hydrogens
        ;
-
-elemental: count? ( c h? b? br? cl? f? rest_elements )
-         | ( b? br? cl? f? h? rest_elements )
-           ;
-
-rest_elements: i? mg? n? o? p? s?
-
-b                   ::= "B" count?
-c                   ::= "C" count?
-h                   ::= "H" count?
-br                  ::= "Br" count?
-cl                  ::= "Cl" count?
-f                   ::= "F" count?
-i                   ::= "I" count?
-mg                  ::= "Mg" count?
-n                   ::= "N" count?
-o                   ::= "O" count?
-p                   ::= "P" count?
-s                   ::= "S" count?
-/* and so on... */
 
 graph: index body
      | count '*' index body
@@ -162,6 +142,16 @@ sub _Lexer
     # Prefix
     if( $self->YYData->{INPUT} =~ s/^(InChI=1S?)// ) {
         return ( 'prefix', $1 );
+    }
+
+    # Formula parts
+    # TODO: Check Hill order, require counts > 1
+    if( $self->YYData->{INPUT} =~ s/^([\/\.])([A-Z][a-z]?\d*)+// ) {
+        if( $1 eq '\/') {
+            return ( 'formula_first', $2 );
+        } else {
+            return ( 'formula_continuation', $2 );
+        }
     }
 
     # Any other character
