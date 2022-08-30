@@ -85,10 +85,19 @@ mh_counts: ',' mh_count
          | mh_counts ',' mh_count
          ;
 
-virtual_hydrogens: index 'H'
-                 | index comma_or_dash_separated_indexes 'H'
-                 | index 'H' count ;
-                 | index comma_or_dash_separated_indexes 'H' count ;
+virtual_hydrogens: virtual_hydrogen_receivers 'H'
+                    { return { map { $_ => 1 } @$_[1] } }
+                 | virtual_hydrogen_receivers 'H' count
+                    { return { map { $_ => $_[3] } @$_[1] } }
+                 ;
+
+virtual_hydrogen_receivers: index
+                            { return [ $_[1] ] }
+                          | virtual_hydrogen_receivers ',' index
+                            { push @$_[1], $_[3] }
+                          | virtual_hydrogen_receivers '-' index
+                            { push @$_[1], $_->[-1]..$_[3] }
+                          ;
 
 mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
                 | '(' 'H' '-' comma_separated_indexes ')'
@@ -101,11 +110,6 @@ comma_separated_indexes: ',' index
                        | comma_separated_indexes ',' index
                             { push @$_[1], $_[3] }
                        ;
-
-comma_or_dash_separated_indexes: comma_separated_indexes
-                               | comma_separated_indexes '-' index
-                               | '-' index
-                               ;
 
 index: nonzero
      | index digit
