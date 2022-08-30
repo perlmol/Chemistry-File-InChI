@@ -108,12 +108,7 @@ comma_separated_indexes: ',' index
                             { push @$_[1], $_[3] }
                        ;
 
-index: nonzero
-     | index digit
-        {
-            return join '', @_;
-        }
-     ;
+index: '1' | count ;
 
 count: '1' digit
         {
@@ -126,9 +121,7 @@ count: '1' digit
      | twoplus
      ;
 
-digit: '0' | nonzero ;
-
-nonzero: '1' | twoplus ;
+digit: '0' | '1' | twoplus ;
 
 twoplus: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
 
