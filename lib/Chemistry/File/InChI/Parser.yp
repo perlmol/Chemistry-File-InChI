@@ -45,42 +45,50 @@ h_atoms: '/' 'h'
 
 # Production 'tail' is merged to 'graph' and 'body' for simplicity.
 
-graph: index bodies
-        { _add_bonds( @_ ) }
-     | count '*' index bodies
-        { $_[0]->_add_bonds( $_[3], $_[4] ) }
+graph: chain
+     | count '*' chain
      ;
 
-body: '-' index
-        { return $_[2] }
-    | branches index
-        { return [ @{$_[1]}, $_[2] ] }
-    ;
+# Return: The last atom in a chain
+chain: index '-' index
+        { $_[0]->_add_bonds( $_[1], $_[3] ); return $_[3] }
+     | index branches index
+        { $_[0]->_add_bonds( $_[1], [ @{$_[2]}, $_[3] ] ); return $_[3] }
+     | chain '-' index
+        { $_[0]->_add_bonds( $_[1], $_[3] ); return $_[3] }
+     | chain branches index
+        { $_[0]->_add_bonds( $_[1], [ @{$_[2]}, $_[3] ] ); return $_[3] }
+     ;
 
-bodies: body
-      | bodies body
-        { _add_bonds( @_ ); return $_[2] }
-      ;
+branch: '(' branch_body ')' { return $_[2]->{bonds} } ;
 
-branch: '(' index ')'
-        { return $_[2] }
-      | '(' index branch_body ')'
-        { return $_[2] }
-      ;
-
-branch_body: ',' index
-                { return $_[2] } # This means connection to the atom before the branch
-           | body
+# Return: Array with all atoms connected to the parent one
+branch_body: index
+                { return { bonds => [ $_[1] ], last => $_[1] } }
            | branch_body ',' index
-                { return $_[1] }
-           | branch_body body
-                { return $_[1] }
+                {
+                    push @{$_[1]->{bonds}}, $_[3];
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
+           | branch_body '-' index
+                {
+                    $_[0]->_add_bonds( $_[1]->{last}, $_[3] );
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
+           | branch_body branches index
+                {
+                    $_[0]->_add_bonds( $_[1]->{last}, [ @{$_[2]}, $_[3] ] );
+                    $_[1]->{last} = $_[3];
+                    return $_[1];
+                }
            ;
 
 branches: branch
-            { return [ $_[1] ] }
+            { return $_[1] }
         | branches branch
-            { push @{$_[1]}, $_[2] }
+            { return [ @{$_[1]}, @{$_[2]} ] }
         ;
 
 hydrogens: vh_count
@@ -105,15 +113,21 @@ mh_counts: ',' mh_count
 virtual_hydrogens: virtual_hydrogen_receivers 'H'
                     { $_[0]->_add_hydrogens( $_[1] ) }
                  | virtual_hydrogen_receivers 'H' count
-                    { $_[0]->_add_hydrogens( $_[1], $_[2] ) }
+                    { $_[0]->_add_hydrogens( $_[1], $_[3] ) }
                  ;
 
 virtual_hydrogen_receivers: index
                             { return [ $_[1] ] }
                           | virtual_hydrogen_receivers ',' index
-                            { push @{$_[1]}, $_[3] }
+                            {
+                                push @{$_[1]}, $_[3];
+                                return $_[1];
+                            }
                           | virtual_hydrogen_receivers '-' index
-                            { push @{$_[1]}, ($_[1]->[-1] + 1)..$_[3] }
+                            {
+                                push @{$_[1]}, ($_[1]->[-1] + 1)..$_[3];
+                                return $_[1]
+                            }
                           ;
 
 mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
@@ -125,18 +139,21 @@ mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
 comma_separated_indexes: ',' index
                             { return [ $_[2] ] }
                        | comma_separated_indexes ',' index
-                            { push @{$_[1]}, $_[3] }
+                            {
+                                push @{$_[1]}, $_[3];
+                                return $_[1];
+                            }
                        ;
 
 index: '1' | count ;
 
 count: '1' digit
         {
-            return join '', @_;
+            return join '', @_[1..2];
         }
      | count digit
         {
-            return join '', @_;
+            return join '', @_[1..2];
         }
      | twoplus
      ;
@@ -155,7 +172,7 @@ sub parse
 
     $self->YYData->{INPUT} = $string;
     $self->{USER}{MOL}     = $mol;
-    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 1 );
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 5 );
 }
 
 sub _Lexer
