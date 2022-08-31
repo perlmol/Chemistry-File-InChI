@@ -156,7 +156,7 @@ sub parse
 
     $self->YYData->{INPUT} = $string;
     $self->{USER}{MOL}     = $mol;
-    $self->YYParse( yylex => \&_Lexer );
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 1 );
 }
 
 sub _Lexer
@@ -194,7 +194,7 @@ sub _Lexer
             }
         }
 
-        if( $sep eq '\/') {
+        if( $sep eq '/') {
             return ( 'formula_first', $formula );
         } else {
             return ( 'formula_continuation', $formula );
@@ -207,6 +207,12 @@ sub _Lexer
     }
 
     return ( '', '' );
+}
+
+sub _Error
+{
+    my( $self ) = @_;
+    print STDERR "ERROR!\n";
 }
 
 sub _add_bonds
