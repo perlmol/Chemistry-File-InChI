@@ -46,27 +46,35 @@ h_atoms: '/' 'h'
 # Production 'tail' is merged to 'graph' and 'body' for simplicity.
 
 graph: index bodies
+        { _add_bonds( @_ ) }
      | count '*' index bodies
+        { $_[0]->_add_bonds( $_[3], $_[4] ) }
      ;
 
 body: '-' index
+        { return $_[2] }
     | branches index
+        { return [ $_[1], $_[2] ] }
     ;
 
 bodies: body
-        { return [ $_[1] ] }
       | bodies body
-        { push @{$_[1]}, $_[2] }
+        { _add_bonds( @_ ); return $_[2] }
       ;
 
 branch: '(' index ')'
+        { return $_[2] }
       | '(' index branch_body ')'
+        { return $_[2] }
       ;
 
 branch_body: ',' index
+                # What does this mean?
            | body
            | branch_body ',' index
+                { return $_[1] }
            | branch_body body
+                { return $_[1] }
            ;
 
 branches: branch
@@ -199,6 +207,23 @@ sub _Lexer
     }
 
     return ( '', '' );
+}
+
+sub _add_bonds
+{
+    my( $self, $a, $b ) = @_;
+
+    $a = $self->{USER}{ATOM_MAP}{$a};
+
+    if( ref $b eq 'ARRAY' ) {
+        for (@$b) {
+            $self->{USER}{MOL}->new_bond( atoms => [ $a,
+                                                     $self->{USER}{ATOM_MAP}{$_} ] );
+        }
+    } else {
+        $b = $self->{USER}{ATOM_MAP}{$b};
+        $self->{USER}{MOL}->new_bond( atoms => [ $a, $b ] );
+    }
 }
 
 1;
