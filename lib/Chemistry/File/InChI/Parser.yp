@@ -114,7 +114,7 @@ virtual_hydrogen_receivers: index
                           | virtual_hydrogen_receivers ',' index
                             { push @{$_[1]}, $_[3] }
                           | virtual_hydrogen_receivers '-' index
-                            { push @{$_[1]}, $_->[-1]..$_[3] }
+                            { push @{$_[1]}, ($_[1]->[-1] + 1)..$_[3] }
                           ;
 
 mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
