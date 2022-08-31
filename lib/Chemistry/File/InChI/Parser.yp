@@ -5,6 +5,8 @@
 use strict;
 use warnings;
 
+use Chemistry::Atom;
+
 %}
 
 %%
@@ -171,12 +173,16 @@ sub _Lexer
     if( $self->YYData->{INPUT} =~ s/^([\/\.])([A-Z][a-z]?\d*)+// ) {
         my( $sep, $formula ) = ( $1, $2 );
 
+        $self->{USER}{ATOM_MAP} = {}; # New atom map, reset if present
+
         while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
             my( $element, $count ) = ( $1, $2 );
             next if $element eq 'H'; # H atoms will be added later
             $count = 1 unless $count;
             for (1..$count) {
-                $self->{USER}{MOL}->new_atom( symbol => $element );
+                my $atom = Chemistry::Atom->new( symbol => $element );
+                $self->{USER}{MOL}->add_atom( $atom );
+                $self->{USER}{ATOM_MAP}{scalar( keys %{$self->{USER}{ATOM_MAP}} ) + 1} = $atom;
             }
         }
 
