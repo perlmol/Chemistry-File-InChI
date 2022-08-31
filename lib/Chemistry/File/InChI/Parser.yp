@@ -92,7 +92,6 @@ hydrogens: vh_count
 
 vh_count: virtual_hydrogens
         | vh_count ',' virtual_hydrogens
-            { return { %$_[1], %$_[3] } }
         ;
 
 mh_count: mobile_hydrogens
