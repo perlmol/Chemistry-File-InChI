@@ -194,7 +194,7 @@ sub _Lexer
 
     # Formula parts
     # TODO: Check Hill order, require counts > 1
-    if( $self->YYData->{INPUT} =~ s/^([\/\.])(([A-Z][a-z]?\d*)+)// ) {
+    if( $self->YYData->{INPUT} =~ s/^([\/\.])\d*(([A-Z][a-z]?\d*)+)// ) {
         my( $sep, $formula ) = ( $1, $2 );
 
         $self->{USER}{ATOM_MAP} = {}; # New atom map, reset if present
