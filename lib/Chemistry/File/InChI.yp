@@ -1,5 +1,12 @@
 # Header section
 
+%{
+
+use strict;
+use warnings;
+
+%}
+
 %%
 
 # Rules section
