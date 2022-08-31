@@ -140,6 +140,14 @@ twoplus: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
 
 # Footer section
 
+sub parse
+{
+    my( $self, $string ) = @_;
+
+    $self->YYData->{INPUT} = $string;
+    $self->YYParse( yylex => \&_Lexer );
+}
+
 sub _Lexer
 {
     my( $self ) = @_;
