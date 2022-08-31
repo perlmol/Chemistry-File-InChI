@@ -34,13 +34,19 @@ h_atoms: '/' 'h'
        | h_atoms ';' hydrogens
        ;
 
-graph: index body
-     | count '*' index body
+# Production 'tail' is merged to 'graph' and 'body' for simplicity.
+
+graph: index bodies
+     | count '*' index bodies
      ;
 
-body: '-' tail
-    | branches tail
+body: '-' index
+    | branches index
     ;
+
+bodies: body
+      | bodies body
+      ;
 
 branch: '(' index ')'
       | '(' index branch_body ')'
@@ -57,10 +63,6 @@ branches: branch
         | branches branch
             { push @$_[1], $_[2] }
         ;
-
-tail: index
-    | tail body
-    ;
 
 hydrogens: vh_count
          | vh_count mh_counts
