@@ -69,7 +69,7 @@ branch: '(' index ')'
       ;
 
 branch_body: ',' index
-                { return undef } # FIXME: What does this mean?
+                { return $_[2] } # This means connection to the atom before the branch
            | body
            | branch_body ',' index
                 { return $_[1] }
