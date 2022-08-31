@@ -104,9 +104,9 @@ mh_counts: ',' mh_count
          ;
 
 virtual_hydrogens: virtual_hydrogen_receivers 'H'
-                    { return { map { $_ => 1 } @$_[1] } }
+                    { $_[0]->_add_hydrogens( $_[1] ) }
                  | virtual_hydrogen_receivers 'H' count
-                    { return { map { $_ => $_[3] } @$_[1] } }
+                    { $_[0]->_add_hydrogens( $_[1], $_[2] ) }
                  ;
 
 virtual_hydrogen_receivers: index
@@ -229,6 +229,21 @@ sub _add_bonds
     } else {
         $b = $self->{USER}{ATOM_MAP}{$b};
         $self->{USER}{MOL}->new_bond( atoms => [ $a, $b ] );
+    }
+}
+
+sub _add_hydrogens
+{
+    my( $self, $atoms, $count ) = @_;
+
+    my @atoms = map { $self->{USER}{ATOM_MAP}{$_} }
+                    ref $atoms ? @$atoms : ( $atoms );
+    $count = 1 unless $count;
+    for my $atom (@atoms) {
+        for (1..$count) {
+            my $H = Chemistry::Atom->new( symbol => 'H' );
+            $self->{USER}{MOL}->new_bond( atoms => [ $atom, $H ] );
+        }
     }
 }
 
