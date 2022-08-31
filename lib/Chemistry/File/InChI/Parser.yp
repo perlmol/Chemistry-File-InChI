@@ -142,9 +142,10 @@ twoplus: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
 
 sub parse
 {
-    my( $self, $string ) = @_;
+    my( $self, $string, $mol ) = @_;
 
     $self->YYData->{INPUT} = $string;
+    $self->{USER}{MOL}     = $mol;
     $self->YYParse( yylex => \&_Lexer );
 }
 
@@ -168,10 +169,21 @@ sub _Lexer
     # Formula parts
     # TODO: Check Hill order, require counts > 1
     if( $self->YYData->{INPUT} =~ s/^([\/\.])([A-Z][a-z]?\d*)+// ) {
-        if( $1 eq '\/') {
-            return ( 'formula_first', $2 );
+        my( $sep, $formula ) = ( $1, $2 );
+
+        while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
+            my( $element, $count ) = ( $1, $2 );
+            next if $element eq 'H'; # H atoms will be added later
+            $count = 1 unless $count;
+            for (1..$count) {
+                $self->{USER}{MOL}->new_atom( symbol => $element );
+            }
+        }
+
+        if( $sep eq '\/') {
+            return ( 'formula_first', $formula );
         } else {
-            return ( 'formula_continuation', $2 );
+            return ( 'formula_continuation', $formula );
         }
     }
 
