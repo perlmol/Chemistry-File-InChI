@@ -54,7 +54,7 @@ graph: index bodies
 body: '-' index
         { return $_[2] }
     | branches index
-        { return [ $_[1], $_[2] ] }
+        { return [ @{$_[1]}, $_[2] ] }
     ;
 
 bodies: body
