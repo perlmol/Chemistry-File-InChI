@@ -52,7 +52,9 @@ body: '-' index
     ;
 
 bodies: body
+        { return [ $_[1] ] }
       | bodies body
+        { push @{$_[1]}, $_[2] }
       ;
 
 branch: '(' index ')'
