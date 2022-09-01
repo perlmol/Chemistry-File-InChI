@@ -42,9 +42,13 @@ connections: '/' 'c'
            ;
 
 h_atoms: '/' 'h'
+            { $_[0]->{USER}{CURSOR}++ }
        | '/' 'h' hydrogens
+            { $_[0]->{USER}{CURSOR}++ }
        | h_atoms ';'
+            { $_[0]->{USER}{CURSOR}++ }
        | h_atoms ';' hydrogens
+            { $_[0]->{USER}{CURSOR}++ }
        ;
 
 # Production 'tail' is merged to 'graph' and 'body' for simplicity.
@@ -223,10 +227,10 @@ sub _Lexer
         }
     }
 
-    # Reset cursor on '/'
-    if( $self->YYData->{INPUT} =~ s/^(\/)// ) {
+    # Reset cursor on 'h'
+    if( $self->YYData->{INPUT} =~ s/^(h)// ) {
         $self->{USER}{CURSOR} = 0;
-        return ( '/', '/' );
+        return ( 'h', 'h' );
     }
 
     # Any other character
