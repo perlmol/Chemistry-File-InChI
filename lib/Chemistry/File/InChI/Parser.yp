@@ -32,9 +32,13 @@ formula: formula_first
        ;
 
 connections: '/' 'c'
+                { $_[0]->{USER}{CURSOR}++ }
            | '/' 'c' graph
+                { $_[0]->{USER}{CURSOR}++ }
            | connections ';'
+                { $_[0]->{USER}{CURSOR}++ }
            | connections ';' graph
+                { $_[0]->{USER}{CURSOR}++ }
            ;
 
 h_atoms: '/' 'h'
@@ -172,6 +176,7 @@ sub parse
 
     $self->YYData->{INPUT} = $string;
     $self->{USER}{MOL}     = $mol;
+    $self->{USER}{CURSOR}  = 0;
     $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 5 );
 }
 
@@ -196,8 +201,7 @@ sub _Lexer
     # TODO: Check Hill order, require counts > 1
     if( $self->YYData->{INPUT} =~ s/^([\/\.])\d*(([A-Z][a-z]?\d*)+)// ) {
         my( $sep, $formula ) = ( $1, $2 );
-
-        $self->{USER}{ATOM_MAP} = {}; # New atom map, reset if present
+        my %atom_map;
 
         while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
             my( $element, $count ) = ( $1, $2 );
@@ -206,15 +210,23 @@ sub _Lexer
             for (1..$count) {
                 my $atom = Chemistry::Atom->new( symbol => $element );
                 $self->{USER}{MOL}->add_atom( $atom );
-                $self->{USER}{ATOM_MAP}{scalar( keys %{$self->{USER}{ATOM_MAP}} ) + 1} = $atom;
+                $atom_map{scalar( keys %atom_map ) + 1} = $atom;
             }
         }
 
         if( $sep eq '/') {
+            $self->{USER}{ATOM_MAPS} = [ \%atom_map ];
             return ( 'formula_first', $formula );
         } else {
+            push @{$self->{USER}{ATOM_MAPS}}, \%atom_map;
             return ( 'formula_continuation', $formula );
         }
+    }
+
+    # Reset cursor on '/'
+    if( $self->YYData->{INPUT} =~ s/^(\/)// ) {
+        $self->{USER}{CURSOR} = 0;
+        return ( '/', '/' );
     }
 
     # Any other character
@@ -235,16 +247,16 @@ sub _add_bonds
 {
     my( $self, $a, $b ) = @_;
 
-    $a = $self->{USER}{ATOM_MAP}{$a};
+    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
+    $a = $atom_map->{$a};
 
     if( ref $b eq 'ARRAY' ) {
         for (@$b) {
             $self->{USER}{MOL}->new_bond( atoms => [ $a,
-                                                     $self->{USER}{ATOM_MAP}{$_} ] );
+                                                     $atom_map->{$_} ] );
         }
     } else {
-        $b = $self->{USER}{ATOM_MAP}{$b};
-        $self->{USER}{MOL}->new_bond( atoms => [ $a, $b ] );
+        $self->{USER}{MOL}->new_bond( atoms => [ $a, $atom_map->{$b} ] );
     }
 }
 
@@ -252,7 +264,8 @@ sub _add_hydrogens
 {
     my( $self, $atoms, $count ) = @_;
 
-    my @atoms = map { $self->{USER}{ATOM_MAP}{$_} }
+    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
+    my @atoms = map { $atom_map->{$_} }
                     ref $atoms ? @$atoms : ( $atoms );
     $count = 1 unless $count;
     for my $atom (@atoms) {
