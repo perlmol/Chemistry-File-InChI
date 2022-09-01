@@ -203,8 +203,9 @@ sub _Lexer
 
     # Formula parts
     # TODO: Check Hill order, require counts > 1
-    if( $self->YYData->{INPUT} =~ s/^([\/\.])\d*(([A-Z][a-z]?\d*)+)// ) {
-        my( $sep, $formula ) = ( $1, $2 );
+    if( $self->YYData->{INPUT} =~ s/^([\/\.])([2-9]|[1-9][0-9]+)?(([A-Z][a-z]?\d*)+)// ) {
+        my( $sep, $count, $formula ) = ( $1, $2, $3 );
+        my $count = 1 unless $count;
         my %atom_map;
 
         while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
@@ -220,9 +221,11 @@ sub _Lexer
 
         if( $sep eq '/') {
             $self->{USER}{ATOM_MAPS} = [ \%atom_map ];
+            $self->{USER}{COUNTS}    = [ $count ];
             return ( 'formula_first', $formula );
         } else {
             push @{$self->{USER}{ATOM_MAPS}}, \%atom_map;
+            push @{$self->{USER}{COUNTS}},    $count;
             return ( 'formula_continuation', $formula );
         }
     }
