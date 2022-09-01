@@ -36,6 +36,6 @@ use Chemistry::File::InChI;
 use Test::More tests => 1;
 
 for (0..$#cases) {
-    Chemistry::File::InChI::parse( $cases[$_] );
+    Chemistry::File::InChI->parse_string( $cases[$_] );
 }
 ok( 'parsed' );

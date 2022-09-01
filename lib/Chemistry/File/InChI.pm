@@ -12,12 +12,16 @@ use Chemistry::File::InChI::Parser;
 
 Chemistry::Mol->register_format(inchi => __PACKAGE__);
 
-sub parse
+sub read_mol
 {
-    my ($string) = @_;
+    my ($self, $fh, %opts) = @_;
+
+    my $line = <$fh>;
+    return unless defined $line;
+    $line =~ s/\r\n//g;
 
     my $parser = Chemistry::File::InChI::Parser->new;
-    return $parser->parse( $string );
+    return $parser->parse( $line );
 }
 
 sub name_is {
