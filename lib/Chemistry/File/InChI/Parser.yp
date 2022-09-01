@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Chemistry::Atom;
+use Chemistry::Mol;
 
 %}
 
@@ -176,12 +177,14 @@ twoplus: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
 
 sub parse
 {
-    my( $self, $string, $mol ) = @_;
+    my( $self, $string ) = @_;
 
     $self->YYData->{INPUT} = $string;
-    $self->{USER}{MOL}     = $mol;
+    $self->{USER}{MOL}     = Chemistry::Mol->new;
     $self->{USER}{CURSOR}  = 0;
     $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 5 );
+
+    return $self->{USER}{MOL};
 }
 
 sub _Lexer
