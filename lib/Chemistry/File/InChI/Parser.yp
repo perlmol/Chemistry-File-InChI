@@ -182,7 +182,7 @@ sub parse
     $self->YYData->{INPUT} = $string;
     $self->{USER}{MOL}     = Chemistry::Mol->new;
     $self->{USER}{CURSOR}  = 0;
-    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 5 );
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 0 );
 
     return $self->{USER}{MOL};
 }
@@ -208,7 +208,7 @@ sub _Lexer
     # TODO: Check Hill order, require counts > 1
     if( $self->YYData->{INPUT} =~ s/^([\/\.])([2-9]|[1-9][0-9]+)?(([A-Z][a-z]?\d*)+)// ) {
         my( $sep, $count, $formula ) = ( $1, $2, $3 );
-        my $count = 1 unless $count;
+        $count = 1 unless $count;
         my %atom_map;
 
         while( $formula =~ /([A-Z][a-z]?)(\d*)/g ) {
@@ -281,6 +281,7 @@ sub _add_hydrogens
     for my $atom (@atoms) {
         for (1..$count) {
             my $H = Chemistry::Atom->new( symbol => 'H' );
+            $self->{USER}{MOL}->add_atom( $H );
             $self->{USER}{MOL}->new_bond( atoms => [ $atom, $H ] );
         }
     }
