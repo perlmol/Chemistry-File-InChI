@@ -257,16 +257,10 @@ sub _add_bonds
 {
     my( $self, $a, $b ) = @_;
 
-    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
-    $a = $atom_map->{$a};
-
-    if( ref $b eq 'ARRAY' ) {
-        for (@$b) {
-            $self->{USER}{MOL}->new_bond( atoms => [ $a,
-                                                     $atom_map->{$_} ] );
-        }
-    } else {
-        $self->{USER}{MOL}->new_bond( atoms => [ $a, $atom_map->{$b} ] );
+    my @bonds = ref $b eq 'ARRAY' ? @$b : $b;
+    for (@bonds) {
+        $self->{USER}{MOL}->new_bond( atoms => [ $self->_get_atom( $a ),
+                                                 $self->_get_atom( $_ ) ] );
     }
 }
 
@@ -285,6 +279,24 @@ sub _add_hydrogens
             $self->{USER}{MOL}->new_bond( atoms => [ $atom, $H ] );
         }
     }
+}
+
+sub _get_atom
+{
+    my( $self, $atom ) = @_;
+
+    my $atom_map = $self->{USER}{ATOM_MAPS}[$self->{USER}{CURSOR}];
+
+    if( !exists $atom_map->{$atom} ) {
+        # If an atom with given index does not exist, this is probably a hydrogen.
+        # FIXME: Check if there are unused hydrogen atoms.
+
+        my $H = Chemistry::Atom->new( symbol => 'H' );
+        $self->{USER}{MOL}->add_atom( $H );
+        $atom_map->{$atom} = $H;
+    }
+
+    return $atom_map->{$atom};
 }
 
 1;
