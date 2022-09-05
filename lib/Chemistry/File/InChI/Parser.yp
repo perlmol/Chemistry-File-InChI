@@ -169,7 +169,9 @@ comma_separated_indexes: ',' index
                        ;
 
 tetrahedral_center: index '+'
+                    { $_[0]->_get_atom( $1 )->attr( 'inchi/chirality', $2 ) }
                   | index '-'
+                    { $_[0]->_get_atom( $1 )->attr( 'inchi/chirality', $2 ) }
                   | index '?'
                   ;
 
