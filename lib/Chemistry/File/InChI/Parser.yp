@@ -16,11 +16,12 @@ use Chemistry::Mol;
 
 # The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
 
-string: prefix maybe_formula maybe_connections maybe_h_atoms ;
+string: prefix maybe_formula maybe_connections maybe_h_atoms maybe_tetrahedral ;
 
 maybe_formula: | formula ;
 maybe_connections: | connections ;
 maybe_h_atoms: | h_atoms ;
+maybe_tetrahedral: | tetrahedral ;
 
 formula: formula_first
             { return [ $_[1] ] }
@@ -47,6 +48,12 @@ h_atoms: '/' 'h'
        | h_atoms ';' hydrogens
             { $_[0]->{USER}{CURSOR}++ }
        ;
+
+tetrahedral: '/' 't'
+           | '/' 't' tetrahedral_centers
+           | tetrahedral ';'
+           | tetrahedral ';' tetrahedral_centers
+           ;
 
 # Production 'tail' is merged to 'graph' and 'body' for simplicity.
 
@@ -149,6 +156,15 @@ comma_separated_indexes: ',' index
                                 return $_[1];
                             }
                        ;
+
+tetrahedral_center: index '+'
+                  | index '-'
+                  | index '?'
+                  ;
+
+tetrahedral_centers: tetrahedral_center
+                   | tetrahedral_centers ',' tetrahedral_center
+                   ;
 
 index: '1' | count ;
 
