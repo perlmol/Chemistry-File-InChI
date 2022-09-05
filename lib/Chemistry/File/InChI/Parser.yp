@@ -16,12 +16,23 @@ use Chemistry::Mol;
 
 # The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
 
-string: prefix maybe_formula maybe_connections maybe_h_atoms maybe_tetrahedral ;
-
-maybe_formula: | formula ;
-maybe_connections: | connections ;
-maybe_h_atoms: | h_atoms ;
-maybe_tetrahedral: | tetrahedral ;
+string: prefix
+      | prefix formula
+      | prefix connections
+      | prefix h_atoms
+      | prefix tetrahedral
+      | prefix formula connections
+      | prefix formula h_atoms
+      | prefix formula tetrahedral
+      | prefix connections h_atoms
+      | prefix connections tetrahedral
+      | prefix h_atoms tetrahedral
+      | prefix formula connections h_atoms
+      | prefix formula connections tetrahedral
+      | prefix formula h_atoms tetrahedral
+      | prefix connections h_atoms tetrahedral
+      | prefix formula connections h_atoms tetrahedral
+      ;
 
 formula: formula_first
             { return [ $_[1] ] }
