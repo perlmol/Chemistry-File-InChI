@@ -256,14 +256,14 @@ sub _Lexer
         }
     }
 
-    # Reset cursor on 'h'
-    if( $self->YYData->{INPUT} =~ s/^(h)// ) {
+    # Reset cursor on 'h' or 't'
+    if( $self->YYData->{INPUT} =~ s/^([ht])// ) {
         $self->{USER}{CURSOR} = 0;
-        return ( 'h', 'h' );
+        return ( $1, $1 );
     }
 
     # Remove unsupported layers
-    $self->YYData->{INPUT} =~ s/^(\/[qpbtmsifo][^\/]*)+//;
+    $self->YYData->{INPUT} =~ s/^(\/[qpbmsifo][^\/]*)+//;
 
     # Any other character
     if( $self->YYData->{INPUT} =~ s/^(.)// ) {
