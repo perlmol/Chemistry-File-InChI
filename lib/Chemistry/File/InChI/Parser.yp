@@ -16,15 +16,11 @@ use Chemistry::Mol;
 
 # The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
 
-string: prefix
-      | prefix formula
-      | prefix connections
-      | prefix h_atoms
-      | prefix formula connections
-      | prefix formula h_atoms
-      | prefix connections h_atoms
-      | prefix formula connections h_atoms
-      ;
+string: prefix maybe_formula maybe_connections maybe_h_atoms ;
+
+maybe_formula: | formula ;
+maybe_connections: | connections ;
+maybe_h_atoms: | h_atoms ;
 
 formula: formula_first
             { return [ $_[1] ] }
