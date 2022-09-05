@@ -239,6 +239,9 @@ sub _Lexer
         return ( 'h', 'h' );
     }
 
+    # Remove unsupported layers
+    $self->YYData->{INPUT} =~ s/^(\/[qpbtmsifo][^\/]*)+//;
+
     # Any other character
     if( $self->YYData->{INPUT} =~ s/^(.)// ) {
         return ( $1, $1 );
