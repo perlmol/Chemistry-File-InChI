@@ -66,6 +66,12 @@ tetrahedral: '/' 't'
            | tetrahedral ';' tetrahedral_centers
            ;
 
+stereochemistry: '/' 's' '1'
+                    { $_[0]->{USER}{MOL}->attr( 'inchi/stereochemistry', $_[3] ) }
+               | '/' 's' '2'
+                    { $_[0]->{USER}{MOL}->attr( 'inchi/stereochemistry', $_[3] ) }
+               ;
+
 # Production 'tail' is merged to 'graph' and 'body' for simplicity.
 
 graph: chain
