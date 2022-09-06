@@ -249,11 +249,11 @@ sub _Lexer
 
         if( $sep eq '/') {
             $self->{USER}{ATOM_MAPS} = [ \%atom_map ];
-            $self->{USER}{COUNTS}    = [ $count ];
+            $self->{USER}{MOL}->attr( 'inchi/counts', [ $count ] );
             return ( 'formula_first', $formula );
         } else {
             push @{$self->{USER}{ATOM_MAPS}}, \%atom_map;
-            push @{$self->{USER}{COUNTS}},    $count;
+            push @{$self->{USER}{MOL}->attr( 'inchi/counts' )}, $count;
             return ( 'formula_continuation', $formula );
         }
     }
