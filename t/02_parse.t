@@ -43,6 +43,6 @@ my @cases = qw(
 plan tests => scalar @cases;
 
 for (0..$#cases) {
-    Chemistry::File::InChI->parse_string( $cases[$_] );
-    ok 1, $cases[$_];
+    my $mol = Chemistry::File::InChI->parse_string( $cases[$_] );
+    is scalar $mol->separate, 1, $cases[$_];
 }
