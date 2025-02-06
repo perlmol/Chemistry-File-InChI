@@ -35,7 +35,7 @@ string: prefix
       ;
 
 formula: formula_first
-            { return [ $_[1] ] }
+            { [ $_[1] ] }
        | formula formula_continuation
             { push @{$_[1]}, $_[2] }
        ;
@@ -89,11 +89,11 @@ chain: index '-' index
         { $_[0]->_add_bonds( $_[1], [ @{$_[2]}, $_[3] ] ); return $_[3] }
      ;
 
-branch: '(' branch_body ')' { return $_[2]->{bonds} } ;
+branch: '(' branch_body ')' { $_[2]->{bonds} } ;
 
 # Return: Array with all atoms connected to the parent one
 branch_body: index
-                { return { bonds => [ $_[1] ], last => $_[1] } }
+                { { bonds => [ $_[1] ], last => $_[1] } }
            | branch_body ',' index
                 {
                     push @{$_[1]->{bonds}}, $_[3];
@@ -115,9 +115,9 @@ branch_body: index
            ;
 
 branches: branch
-            { return $_[1] }
+            { $_[1] }
         | branches branch
-            { return [ @{$_[1]}, @{$_[2]} ] }
+            { [ @{$_[1]}, @{$_[2]} ] }
         ;
 
 hydrogens: vh_count
@@ -146,7 +146,7 @@ virtual_hydrogens: virtual_hydrogen_receivers 'H'
                  ;
 
 virtual_hydrogen_receivers: index
-                            { return [ $_[1] ] }
+                            { [ $_[1] ] }
                           | virtual_hydrogen_receivers ',' index
                             {
                                 push @{$_[1]}, $_[3];
@@ -166,7 +166,7 @@ mobile_hydrogens: '(' 'H' comma_separated_indexes ')'
                 ;
 
 comma_separated_indexes: ',' index
-                            { return [ $_[2] ] }
+                            { [ $_[2] ] }
                        | comma_separated_indexes ',' index
                             {
                                 push @{$_[1]}, $_[3];
