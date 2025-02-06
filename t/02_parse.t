@@ -1,3 +1,9 @@
+use strict;
+use warnings;
+
+use Chemistry::File::InChI;
+use Test::More;
+
 my @cases = qw(
     InChI=1S/C4H10O2/c1-3(5)4(2)6/h3-6H,1-2H3
     InChI=1S/C4H6O6/c5-1(3(7)8)2(6)4(9)10/h1-2,5-6H,(H,7,8)(H,9,10)
@@ -34,10 +40,9 @@ my @cases = qw(
     InChI=1S/2C6H12NO5P/c2*7-6(5(8)9)1-4(2-6)3-13(10,11)12/h2*4H,1-3,7H2,(H,8,9)(H2,10,11,12)/t4-,6+;4-,6-
 );
 
-use Chemistry::File::InChI;
-use Test::More tests => 1;
+plan tests => scalar @cases;
 
 for (0..$#cases) {
     Chemistry::File::InChI->parse_string( $cases[$_] );
+    ok 1, $cases[$_];
 }
-ok( 'parsed' );
