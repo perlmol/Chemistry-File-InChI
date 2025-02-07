@@ -284,7 +284,7 @@ sub _Lexer
 sub _Error
 {
     my( $self ) = @_;
-    print STDERR "ERROR!\n";
+    die 'ERROR: ', $self->YYData->{INPUT}, "\n";
 }
 
 sub _add_bonds
