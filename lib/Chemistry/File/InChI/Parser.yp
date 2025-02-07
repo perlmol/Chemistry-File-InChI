@@ -234,9 +234,13 @@ tetrahedral_centers: tetrahedral_center
                    ;
 
 charge: '/' 'q'
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges', [] ) }
       | charge '+' natural
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges' )->[$_[0]->{USER}{CURSOR}] = int(  $_[3] ) }
       | charge '-' natural
+        { $_[0]->{USER}{MOL}->attr( 'inchi/charges' )->[$_[0]->{USER}{CURSOR}] = int( -$_[3] ) }
       | charge ';'
+        { $_[0]->{USER}{CURSOR}++ }
       ;
 
 index: '1' | count ;
