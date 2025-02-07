@@ -19,19 +19,35 @@ use Chemistry::Mol;
 string: prefix
       | prefix formula
       | prefix connections
-      | prefix h_atoms
-      | prefix tetrahedral
       | prefix formula connections
+      | prefix h_atoms
       | prefix formula h_atoms
-      | prefix formula tetrahedral
       | prefix connections h_atoms
-      | prefix connections tetrahedral
-      | prefix h_atoms tetrahedral
       | prefix formula connections h_atoms
+      | prefix tetrahedral
+      | prefix formula tetrahedral
+      | prefix connections tetrahedral
       | prefix formula connections tetrahedral
+      | prefix h_atoms tetrahedral
       | prefix formula h_atoms tetrahedral
       | prefix connections h_atoms tetrahedral
       | prefix formula connections h_atoms tetrahedral
+      | prefix stereochemistry
+      | prefix formula stereochemistry
+      | prefix connections stereochemistry
+      | prefix formula connections stereochemistry
+      | prefix h_atoms stereochemistry
+      | prefix formula h_atoms stereochemistry
+      | prefix connections h_atoms stereochemistry
+      | prefix formula connections h_atoms stereochemistry
+      | prefix tetrahedral stereochemistry
+      | prefix formula tetrahedral stereochemistry
+      | prefix connections tetrahedral stereochemistry
+      | prefix formula connections tetrahedral stereochemistry
+      | prefix h_atoms tetrahedral stereochemistry
+      | prefix formula h_atoms tetrahedral stereochemistry
+      | prefix connections h_atoms tetrahedral stereochemistry
+      | prefix formula connections h_atoms tetrahedral stereochemistry
       ;
 
 formula: formula_first

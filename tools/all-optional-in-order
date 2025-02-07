@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Algorithm::Combinatorics qw( subsets );
+
+local $\ = "\n";
+
+for (reverse subsets( [ qw( formula connections h_atoms tetrahedral stereochemistry ) ] )) {
+    next unless @$_;
+    print join ' ', @$_;
+}
