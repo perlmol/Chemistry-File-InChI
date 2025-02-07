@@ -24,6 +24,14 @@ string: prefix
       | prefix formula h_atoms
       | prefix connections h_atoms
       | prefix formula connections h_atoms
+      | prefix charge
+      | prefix formula charge
+      | prefix connections charge
+      | prefix formula connections charge
+      | prefix h_atoms charge
+      | prefix formula h_atoms charge
+      | prefix connections h_atoms charge
+      | prefix formula connections h_atoms charge
       | prefix tetrahedral
       | prefix formula tetrahedral
       | prefix connections tetrahedral
@@ -32,6 +40,14 @@ string: prefix
       | prefix formula h_atoms tetrahedral
       | prefix connections h_atoms tetrahedral
       | prefix formula connections h_atoms tetrahedral
+      | prefix charge tetrahedral
+      | prefix formula charge tetrahedral
+      | prefix connections charge tetrahedral
+      | prefix formula connections charge tetrahedral
+      | prefix h_atoms charge tetrahedral
+      | prefix formula h_atoms charge tetrahedral
+      | prefix connections h_atoms charge tetrahedral
+      | prefix formula connections h_atoms charge tetrahedral
       | prefix stereochemistry
       | prefix formula stereochemistry
       | prefix connections stereochemistry
@@ -40,6 +56,14 @@ string: prefix
       | prefix formula h_atoms stereochemistry
       | prefix connections h_atoms stereochemistry
       | prefix formula connections h_atoms stereochemistry
+      | prefix charge stereochemistry
+      | prefix formula charge stereochemistry
+      | prefix connections charge stereochemistry
+      | prefix formula connections charge stereochemistry
+      | prefix h_atoms charge stereochemistry
+      | prefix formula h_atoms charge stereochemistry
+      | prefix connections h_atoms charge stereochemistry
+      | prefix formula connections h_atoms charge stereochemistry
       | prefix tetrahedral stereochemistry
       | prefix formula tetrahedral stereochemistry
       | prefix connections tetrahedral stereochemistry
@@ -48,6 +72,14 @@ string: prefix
       | prefix formula h_atoms tetrahedral stereochemistry
       | prefix connections h_atoms tetrahedral stereochemistry
       | prefix formula connections h_atoms tetrahedral stereochemistry
+      | prefix charge tetrahedral stereochemistry
+      | prefix formula charge tetrahedral stereochemistry
+      | prefix connections charge tetrahedral stereochemistry
+      | prefix formula connections charge tetrahedral stereochemistry
+      | prefix h_atoms charge tetrahedral stereochemistry
+      | prefix formula h_atoms charge tetrahedral stereochemistry
+      | prefix connections h_atoms charge tetrahedral stereochemistry
+      | prefix formula connections h_atoms charge tetrahedral stereochemistry
       ;
 
 formula: formula_first
@@ -201,6 +233,14 @@ tetrahedral_centers: tetrahedral_center
                    | tetrahedral_centers ',' tetrahedral_center
                    ;
 
+charge: '/' 'q'
+      | charge '+' '1'
+      | charge '+' twoplus
+      | charge '-' '1'
+      | charge '-' twoplus
+      | charge ';'
+      ;
+
 index: '1' | count ;
 
 count: '1' digit
@@ -280,14 +320,14 @@ sub _Lexer
         }
     }
 
-    # Reset cursor on 'h' or 't'
-    if( $self->YYData->{INPUT} =~ s/^([ht])// ) {
+    # Reset cursor on 'h', 'q' or 't'
+    if( $self->YYData->{INPUT} =~ s/^([hqt])// ) {
         $self->{USER}{CURSOR} = 0;
         return ( $1, $1 );
     }
 
     # Remove unsupported layers
-    $self->YYData->{INPUT} =~ s/^(\/[qpbmsifo][^\/]*)+//;
+    $self->YYData->{INPUT} =~ s/^(\/[pbmsifo][^\/]*)+//;
 
     # Any other character
     if( $self->YYData->{INPUT} =~ s/^(.)// ) {
