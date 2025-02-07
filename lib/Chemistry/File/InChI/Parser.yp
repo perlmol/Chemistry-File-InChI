@@ -234,25 +234,25 @@ tetrahedral_centers: tetrahedral_center
                    ;
 
 charge: '/' 'q'
-      | charge '+' '1'
-      | charge '+' twoplus
-      | charge '-' '1'
-      | charge '-' twoplus
+      | charge '+' natural
+      | charge '-' natural
       | charge ';'
       ;
 
 index: '1' | count ;
 
 count: '1' digit
-        {
-            return join '', @_[1..2];
-        }
+        { join '', @_[1..2] }
      | count digit
-        {
-            return join '', @_[1..2];
-        }
+        { join '', @_[1..2] }
      | twoplus
      ;
+
+natural: '1'
+       | twoplus
+       | natural digit
+            { join '', @_[1..2] }
+       ;
 
 digit: '0' | '1' | twoplus ;
 
