@@ -8,6 +8,10 @@ use warnings;
 use Chemistry::Atom;
 use Chemistry::Mol;
 
+use List::Util qw( first );
+
+my @LAYER_ORDER = qw( PREFIX FORMULA CONNECTIONS H_ATOMS CHARGE TETRAHEDRAL STEREOCHEMISTRY );
+
 %}
 
 %%
@@ -17,70 +21,31 @@ use Chemistry::Mol;
 # The grammar is taken from https://github.com/metamolecular/inchi-grammar/blob/master/grammar.ebnf, commit 74a8858, MIT license
 
 string: prefix
-      | prefix formula
-      | prefix connections
-      | prefix formula connections
-      | prefix h_atoms
-      | prefix formula h_atoms
-      | prefix connections h_atoms
-      | prefix formula connections h_atoms
-      | prefix charge
-      | prefix formula charge
-      | prefix connections charge
-      | prefix formula connections charge
-      | prefix h_atoms charge
-      | prefix formula h_atoms charge
-      | prefix connections h_atoms charge
-      | prefix formula connections h_atoms charge
-      | prefix tetrahedral
-      | prefix formula tetrahedral
-      | prefix connections tetrahedral
-      | prefix formula connections tetrahedral
-      | prefix h_atoms tetrahedral
-      | prefix formula h_atoms tetrahedral
-      | prefix connections h_atoms tetrahedral
-      | prefix formula connections h_atoms tetrahedral
-      | prefix charge tetrahedral
-      | prefix formula charge tetrahedral
-      | prefix connections charge tetrahedral
-      | prefix formula connections charge tetrahedral
-      | prefix h_atoms charge tetrahedral
-      | prefix formula h_atoms charge tetrahedral
-      | prefix connections h_atoms charge tetrahedral
-      | prefix formula connections h_atoms charge tetrahedral
-      | prefix stereochemistry
-      | prefix formula stereochemistry
-      | prefix connections stereochemistry
-      | prefix formula connections stereochemistry
-      | prefix h_atoms stereochemistry
-      | prefix formula h_atoms stereochemistry
-      | prefix connections h_atoms stereochemistry
-      | prefix formula connections h_atoms stereochemistry
-      | prefix charge stereochemistry
-      | prefix formula charge stereochemistry
-      | prefix connections charge stereochemistry
-      | prefix formula connections charge stereochemistry
-      | prefix h_atoms charge stereochemistry
-      | prefix formula h_atoms charge stereochemistry
-      | prefix connections h_atoms charge stereochemistry
-      | prefix formula connections h_atoms charge stereochemistry
-      | prefix tetrahedral stereochemistry
-      | prefix formula tetrahedral stereochemistry
-      | prefix connections tetrahedral stereochemistry
-      | prefix formula connections tetrahedral stereochemistry
-      | prefix h_atoms tetrahedral stereochemistry
-      | prefix formula h_atoms tetrahedral stereochemistry
-      | prefix connections h_atoms tetrahedral stereochemistry
-      | prefix formula connections h_atoms tetrahedral stereochemistry
-      | prefix charge tetrahedral stereochemistry
-      | prefix formula charge tetrahedral stereochemistry
-      | prefix connections charge tetrahedral stereochemistry
-      | prefix formula connections charge tetrahedral stereochemistry
-      | prefix h_atoms charge tetrahedral stereochemistry
-      | prefix formula h_atoms charge tetrahedral stereochemistry
-      | prefix connections h_atoms charge tetrahedral stereochemistry
-      | prefix formula connections h_atoms charge tetrahedral stereochemistry
+            { 'PREFIX' }
+      | string layer
+            {
+                my $layer1_id = first { $LAYER_ORDER[$_] eq $_[1] } 0..$#LAYER_ORDER;
+                my $layer2_id = first { $LAYER_ORDER[$_] eq $_[2] } 0..$#LAYER_ORDER;
+                die "unknown layer $_[2]\n" unless defined $layer2_id;
+                die "duplicated layer $_[1]\n" if $layer1_id == $layer2_id;
+                die "incorrect layer order, $_[2] must appear before $_[1]\n" if $layer1_id > $layer2_id;
+                $_[2];
+            }
       ;
+
+layer: formula
+            { 'FORMULA' }
+     | connections
+            { 'CONNECTIONS' }
+     | h_atoms
+            { 'H_ATOMS' }
+     | charge
+            { 'CHARGE' }
+     | tetrahedral
+            { 'TETRAHEDRAL' }
+     | stereochemistry
+            { 'STEREOCHEMISTRY' }
+     ;
 
 formula: formula_first
             { [ $_[1] ] }
