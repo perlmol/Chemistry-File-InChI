@@ -4,9 +4,12 @@ use strict;
 use warnings;
 
 use Chemistry::File::InChI;
-use Chemistry::File::SMILES;
-use SmilesScripts::Isomorphism qw( smi_compare );
 use Test::More;
+
+eval 'use Chemistry::File::SMILES';
+plan skip_all => 'no Chemistry::File::SMILES' if $@;
+eval 'use SmilesScripts::Isomorphism qw(smi_compare)';
+plan skip_all => 'no SmilesScripts::Isomorphism' if $@;
 
 my @cases = (
     # Caffeine, from Wikipedia
