@@ -21,6 +21,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Chemistry::Mol      0.35
+    List::Util          0
 
 COPYRIGHT AND LICENSE
 
