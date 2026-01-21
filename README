@@ -1,5 +1,5 @@
-Chemistry/File/InChI  version 0.10
-==================================
+Chemistry/File/InChI version 0.10
+=================================
 
 This module reads InChI files.
 
@@ -24,7 +24,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 Andrius Merkys <merkys@cpan.org>
+Copyright (C) 2022-2026 Andrius Merkys <merkys@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
