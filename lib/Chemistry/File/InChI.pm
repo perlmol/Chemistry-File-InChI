@@ -23,7 +23,15 @@ Chemistry::File::InChI - InChI identifier reader
 
 =head1 DESCRIPTION
 
-InChI identifier reader.
+InChI identifier reader written according to L<Richard L. Apodaca's InChI grammar|https://github.com/metamolecular/inchi-grammar>.
+Only formula, C</c>, C</h>, C</t>, C</s> and C</q> layers are supported at the moment.
+Certain InChI concepts do not map into the concepts of C<Chemistry::Mol>, thus they are stored as molecule and atom attributes.
+
+Count multiplier of a molecule is stored in molecule attribute C<inchi/counts>.
+Stereochemistry setting of C<1> or C<2> is stored in molecule attribute C<inchi/stereochemistry>.
+Charges are stored in molecule attribute C<inchi/charges>.
+
+Tetrahedral center setting C<+> or C<-> is stored in atom attribute C<inchi/chirality>.
 
 =cut
 
